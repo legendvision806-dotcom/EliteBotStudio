@@ -1,3 +1,4 @@
+
 import os
 import streamlit as st
 import chromadb
@@ -7,75 +8,116 @@ from google import genai
 # Page Configuration
 st.set_page_config(
     page_title="EliteBotStudios - ChromaDB RAG Agent Platform", 
-    page_icon="🤖", 
+    page_icon="🌿", 
     layout="wide"
 )
 
-# --- Custom CSS for Styling ---
+# --- Custom CSS for Light Green & Unique Styling ---
 st.markdown("""
 <style>
-    /* Main Background Accent */
+    /* Main Background Accent - Soft Mint Neutral */
     .stApp {
-        background-color: #f8f9fa;
+        background-color: #f4f8f5;
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
     }
     
-    /* Title Banner Styling */
+    /* Title Banner Styling - Emerald / Forest Gradient */
     .header-banner {
-        background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%);
-        padding: 24px;
-        border-radius: 12px;
+        background: linear-gradient(135deg, #1b4332 0%, #2d6a4f 60%, #40916c 100%);
+        padding: 28px 32px;
+        border-radius: 16px;
         color: white;
         margin-bottom: 25px;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        box-shadow: 0 8px 20px rgba(27, 67, 50, 0.12);
+        border: 1px solid rgba(255, 255, 255, 0.1);
     }
     .header-banner h1 {
-        color: white !important;
+        color: #ffffff !important;
         margin: 0;
         font-size: 2.2rem;
         font-weight: 700;
+        letter-spacing: -0.5px;
     }
     .header-banner p {
-        color: #e0e0e0;
-        margin-top: 6px;
+        color: #d8f3dc;
+        margin-top: 8px;
         font-size: 1.05rem;
+        font-weight: 400;
     }
 
-    /* Card Containers */
-    .css-card {
-        background-color: #ffffff;
-        border-radius: 10px;
-        padding: 20px;
-        border: 1px solid #e9ecef;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.02);
-        margin-bottom: 15px;
+    /* Sidebar Customization */
+    section[data-testid="stSidebar"] {
+        background-color: #ebf4ee;
+        border-right: 1px solid #d8f3dc;
     }
 
-    /* Tab Styling */
+    /* Tab Customization */
     .stTabs [data-baseweb="tab-list"] {
-        gap: 8px;
+        gap: 10px;
+        background-color: transparent;
+        padding: 4px;
     }
     .stTabs [data-baseweb="tab"] {
-        height: 48px;
-        border-radius: 8px 8px 0px 0px;
-        padding-left: 16px;
-        padding-right: 16px;
+        height: 46px;
+        border-radius: 10px;
+        padding-left: 20px;
+        padding-right: 20px;
         font-weight: 600;
+        color: #2d6a4f;
+        background-color: #e2ece9;
+        border: 1px solid #d8f3dc;
+        transition: all 0.2s ease-in-out;
+    }
+    .stTabs [aria-selected="true"] {
+        background-color: #2d6a4f !important;
+        color: #ffffff !important;
+        border-color: #2d6a4f !important;
+        box-shadow: 0 4px 10px rgba(45, 106, 79, 0.2);
+    }
+
+    /* Primary Buttons */
+    div.stButton > button[kind="primary"] {
+        background: linear-gradient(135deg, #2d6a4f 0%, #40916c 100%);
+        color: white;
+        border-radius: 10px;
+        border: none;
+        padding: 10px 24px;
+        font-weight: 600;
+        box-shadow: 0 4px 12px rgba(45, 106, 79, 0.15);
+        transition: all 0.2s ease-in-out;
+    }
+    div.stButton > button[kind="primary"]:hover {
+        background: linear-gradient(135deg, #1b4332 0%, #2d6a4f 100%);
+        box-shadow: 0 6px 16px rgba(27, 67, 50, 0.25);
+        transform: translateY(-1px);
     }
 
     /* Agent Result Cards */
     .agent-card {
         background-color: #ffffff;
-        border-left: 5px solid #0d6efd;
-        border-radius: 6px;
-        padding: 16px 20px;
+        border-left: 5px solid #52b788;
+        border-radius: 12px;
+        padding: 20px;
         margin-bottom: 20px;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+        border-top: 1px solid #eaf4ed;
+        border-right: 1px solid #eaf4ed;
+        border-bottom: 1px solid #eaf4ed;
     }
     .agent-title {
-        color: #0d6efd;
+        color: #1b4332;
         font-weight: 700;
-        font-size: 1.1rem;
-        margin-bottom: 10px;
+        font-size: 1.15rem;
+        margin-bottom: 8px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    /* Custom Metric Container */
+    [data-testid="stMetricValue"] {
+        color: #2d6a4f !important;
+        font-weight: 700;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -83,7 +125,7 @@ st.markdown("""
 # Application Header
 st.markdown("""
 <div class="header-banner">
-    <h1>🤖 EliteBotStudios Platform</h1>
+    <h1>🌿 EliteBotStudios Platform</h1>
     <p>Action-Oriented Multi-Agent & ChromaDB Vector RAG Workflow Engine</p>
 </div>
 """, unsafe_allow_html=True)
