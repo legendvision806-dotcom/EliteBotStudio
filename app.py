@@ -1,4 +1,3 @@
-
 import os
 import streamlit as st
 import chromadb
@@ -12,13 +11,20 @@ st.set_page_config(
     layout="wide"
 )
 
-# --- Custom CSS: Light Blue & Light Green Visual Theme ---
+# --- Custom CSS: Full Outer Screen & Background Styling ---
 st.markdown("""
 <style>
-    /* App Background - Soft Blue-Green Neutral */
-    .stApp {
-        background-color: #f0f7f7;
+    /* Full Outer App & Margins Background */
+    .stApp, [data-testid="stAppViewContainer"], .main, header[data-testid="stHeader"] {
+        background: linear-gradient(180deg, #e0f2fe 0%, #f0f7f7 50%, #e8f5e9 100%) !important;
         font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+
+    /* Inner Page Container Padding */
+    .main .block-container {
+        background-color: transparent;
+        padding-top: 2rem;
+        padding-bottom: 2rem;
     }
     
     /* Header Banner - Sky Blue to Emerald Gradient */
@@ -45,13 +51,13 @@ st.markdown("""
         font-weight: 400;
     }
 
-    /* Sidebar - Light Mint Neutral */
+    /* Sidebar - Light Mint Accent */
     section[data-testid="stSidebar"] {
-        background-color: #e8f4f1;
-        border-right: 1px solid #c8e6c9;
+        background-color: #d8ebd9 !important;
+        border-right: 1px solid #b7e4c7;
     }
 
-    /* Tabs Styling - Light Blue and Green Accents */
+    /* Tabs Styling */
     .stTabs [data-baseweb="tab-list"] {
         gap: 10px;
         background-color: transparent;
@@ -198,7 +204,6 @@ with tab1:
 
                 for file in uploaded_files:
                     content = file.read().decode("utf-8")
-                    # Clean paragraph splitting
                     chunks = [c.strip() for c in content.split("\n\n") if c.strip()]
                     
                     for chunk_idx, chunk in enumerate(chunks):
@@ -211,7 +216,6 @@ with tab1:
                     collection.add(documents=documents, metadatas=metadatas, ids=ids)
                     st.success(f"Successfully indexed **{len(documents)}** chunks across **{len(uploaded_files)}** document(s)!")
 
-    # Collection Stats Display
     st.divider()
     try:
         col = st.session_state.chroma_client.get_collection("elitebot_docs")
@@ -239,7 +243,6 @@ with tab2:
             client = genai.Client(api_key=api_key)
             st.session_state.agent_logs = []
 
-            # Step 1: Semantic Search Retrieval with explicit handling
             retrieved_context = "No relevant documents found in ChromaDB."
             try:
                 embed_fn = GeminiEmbeddingFunction(api_key=api_key)
@@ -255,7 +258,6 @@ with tab2:
             except Exception as e:
                 retrieved_context = f"Vector retrieval error: {str(e)}"
 
-            # Execution Pipeline
             with st.status("Executing Multi-Agent Workflow...", expanded=True) as status:
                 st.write("🔍 **Agent 1 (Researcher):** Retrieving & analyzing context...")
                 prompt_agent1 = f"You are Agent 1 (Researcher Agent). Context:\n{retrieved_context}\n\nGoal:\n{user_goal}\nProvide structured findings and key facts."
