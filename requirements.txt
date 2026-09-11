@@ -1,3 +1,12 @@
+# Web Framework & Interface
 streamlit>=1.35.0
+
+# LLM & Embedding SDK
 google-genai>=0.1.0
+
+# Vector Database
 chromadb>=0.4.24
+
+# Network & Utility Dependencies
+pydantic>=2.0.0
+requests>=2.31.0
