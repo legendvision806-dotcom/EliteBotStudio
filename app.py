@@ -76,7 +76,7 @@ with tab1:
                 for file in uploaded_files:
                     content = file.read().decode("utf-8")
                     # Simple line/chunk split
-                    chunks = [c.strip() for c in content.split("
+                    chunks = [c.strip() for c in content.split("\n\n
 
 ") if c.strip()]
                     
