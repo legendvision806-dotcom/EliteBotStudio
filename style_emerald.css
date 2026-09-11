@@ -1,0 +1,105 @@
+/* EliteBotStudios Emerald & Cyber-Green UI Styling Theme */
+
+/* Main Application Container & Background */
+.stApp {
+    background: linear-gradient(135deg, #022c22 0%, #064e3b 40%, #0f172a 100%) !important;
+    color: #f0fdf4 !important;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+/* Glassmorphism Emerald Header Bar */
+.hero-header {
+    background: rgba(6, 78, 59, 0.25);
+    border: 1px solid rgba(52, 211, 153, 0.25);
+    border-radius: 16px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
+    text-align: center;
+}
+
+/* Vibrant Emerald Gradient Title */
+.gradient-title {
+    font-size: 2.8rem;
+    font-weight: 800;
+    background: linear-gradient(90deg, #34d399 0%, #a7f3d0 50%, #38bdf8 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    letter-spacing: -0.02em;
+    margin-bottom: 0.5rem;
+}
+
+.gradient-subtitle {
+    color: #a7f3d0;
+    font-size: 1.15rem;
+    font-weight: 400;
+}
+
+/* Modern Card Layouts for Agent Logs & Outputs with Mint/Green Accents */
+.agent-card {
+    background: rgba(6, 78, 59, 0.35);
+    border-left: 5px solid #10b981;
+    border-top: 1px solid rgba(52, 211, 153, 0.15);
+    border-right: 1px solid rgba(52, 211, 153, 0.15);
+    border-bottom: 1px solid rgba(52, 211, 153, 0.15);
+    border-radius: 12px;
+    padding: 1.25rem 1.5rem;
+    margin-bottom: 1.5rem;
+    backdrop-filter: blur(8px);
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+}
+
+.agent-title {
+    color: #34d399;
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+/* Sidebar Custom Emerald Styling */
+section[data-testid="stSidebar"] {
+    background-color: rgba(2, 44, 34, 0.95) !important;
+    border-right: 1px solid rgba(52, 211, 153, 0.15) !important;
+}
+
+/* Styled Emerald Primary Buttons */
+.stButton > button[kind="primary"] {
+    background: linear-gradient(90deg, #059669 0%, #10b981 100%) !important;
+    border: none !important;
+    color: #ffffff !important;
+    font-weight: 600 !important;
+    border-radius: 8px !important;
+    padding: 0.6rem 1.2rem !important;
+    transition: all 0.3s ease !important;
+    box-shadow: 0 4px 14px rgba(16, 185, 129, 0.4) !important;
+}
+
+.stButton > button[kind="primary"]:hover {
+    transform: translateY(-2px) !important;
+    box-shadow: 0 6px 20px rgba(16, 185, 129, 0.6) !important;
+}
+
+/* Secondary Button Accents */
+.stButton > button {
+    border: 1px solid rgba(52, 211, 153, 0.3) !important;
+    color: #a7f3d0 !important;
+    background: rgba(6, 78, 59, 0.2) !important;
+}
+
+/* Styled Metrics Boxes */
+div[data-testid="stMetricValue"] {
+    color: #34d399 !important;
+    font-weight: 800 !important;
+}
+
+div[data-testid="stMetric"] {
+    background: rgba(6, 78, 59, 0.3);
+    border: 1px solid rgba(52, 211, 153, 0.2);
+    padding: 1rem;
+    border-radius: 12px;
+}
