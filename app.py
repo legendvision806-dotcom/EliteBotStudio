@@ -1,4 +1,3 @@
-
 import os
 import streamlit as st
 import chromadb
@@ -6,17 +5,96 @@ from chromadb.config import Settings
 from google import genai
 
 # Page Configuration
-st.set_page_config(page_title="EliteBotStudios - ChromaDB RAG Agent Platform", page_icon="🤖", layout="wide")
-st.title("🤖 EliteBotStudios Platform")
-st.subheader("Action-Oriented Multi-Agent & ChromaDB Vector RAG Workflow Engine")
+st.set_page_config(
+    page_title="EliteBotStudios - ChromaDB RAG Agent Platform", 
+    page_icon="🤖", 
+    layout="wide"
+)
 
-# Sidebar - Setup
+# --- Custom CSS for Styling ---
+st.markdown("""
+<style>
+    /* Main Background Accent */
+    .stApp {
+        background-color: #f8f9fa;
+    }
+    
+    /* Title Banner Styling */
+    .header-banner {
+        background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%);
+        padding: 24px;
+        border-radius: 12px;
+        color: white;
+        margin-bottom: 25px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    }
+    .header-banner h1 {
+        color: white !important;
+        margin: 0;
+        font-size: 2.2rem;
+        font-weight: 700;
+    }
+    .header-banner p {
+        color: #e0e0e0;
+        margin-top: 6px;
+        font-size: 1.05rem;
+    }
+
+    /* Card Containers */
+    .css-card {
+        background-color: #ffffff;
+        border-radius: 10px;
+        padding: 20px;
+        border: 1px solid #e9ecef;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+        margin-bottom: 15px;
+    }
+
+    /* Tab Styling */
+    .stTabs [data-baseweb="tab-list"] {
+        gap: 8px;
+    }
+    .stTabs [data-baseweb="tab"] {
+        height: 48px;
+        border-radius: 8px 8px 0px 0px;
+        padding-left: 16px;
+        padding-right: 16px;
+        font-weight: 600;
+    }
+
+    /* Agent Result Cards */
+    .agent-card {
+        background-color: #ffffff;
+        border-left: 5px solid #0d6efd;
+        border-radius: 6px;
+        padding: 16px 20px;
+        margin-bottom: 20px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    }
+    .agent-title {
+        color: #0d6efd;
+        font-weight: 700;
+        font-size: 1.1rem;
+        margin-bottom: 10px;
+    }
+</style>
+""", unsafe_allow_html=True)
+
+# Application Header
+st.markdown("""
+<div class="header-banner">
+    <h1>🤖 EliteBotStudios Platform</h1>
+    <p>Action-Oriented Multi-Agent & ChromaDB Vector RAG Workflow Engine</p>
+</div>
+""", unsafe_allow_html=True)
+
+# Sidebar Configuration
 with st.sidebar:
     st.header("⚙️ Configuration")
     api_key = st.text_input("Enter Google Gemini API Key:", type="password")
     selected_model = st.selectbox("Select Gemini Model:", ["gemini-2.5-flash", "gemini-2.5-pro"])
-    st.markdown("---")
-    st.info("EliteBotStudios converts user ideas into multi-agent workflows using ChromaDB Vector RAG and Google Gemini.")
+    st.divider()
+    st.info("💡 **Tip:** Upload your docs in Tab 1, then head to Tab 2 to run your multi-agent workflow.")
 
 # Helper class to wrap Gemini Embedding API for ChromaDB
 class GeminiEmbeddingFunction(chromadb.EmbeddingFunction):
@@ -41,71 +119,76 @@ if "agent_logs" not in st.session_state:
     st.session_state.agent_logs = []
 
 # Main Layout Tabs
-tab1, tab2, tab3 = st.tabs(["📚 Vector Knowledge Base (ChromaDB)", "🤖 Multi-Agent Executor", "📊 Workflow Logs"])
+tab1, tab2, tab3 = st.tabs([
+    "📚 Vector Knowledge Base", 
+    "🤖 Multi-Agent Executor", 
+    "📊 Workflow Logs"
+])
 
-# Tab 1: Multi-Document Upload & Vector Store Indexing
+# Tab 1: Knowledge Base Management
 with tab1:
-    st.header("Upload & Index Documents into ChromaDB")
-    uploaded_files = st.file_uploader("Upload Text (.txt) or Markdown (.md) documents:", type=["txt", "md"], accept_multiple_files=True)
+    st.subheader("Document Indexing")
+    st.caption("Upload text or markdown files to index them into ChromaDB for semantic retrieval.")
+    
+    with st.container():
+        uploaded_files = st.file_uploader("Upload Text (.txt) or Markdown (.md) documents:", type=["txt", "md"], accept_multiple_files=True)
 
-    if st.button("Index Documents into ChromaDB"):
-        if not api_key:
-            st.error("Please enter your Google Gemini API Key in the sidebar.")
-        elif not uploaded_files:
-            st.warning("Please upload at least one text file.")
-        else:
-            with st.spinner("Processing & embedding documents into ChromaDB vector database..."):
-                embed_fn = GeminiEmbeddingFunction(api_key=api_key)
-                
-                # Delete existing collection if re-indexing for demo simplicity
-                try:
-                    st.session_state.chroma_client.delete_collection("elitebot_docs")
-                except Exception:
-                    pass
-
-                collection = st.session_state.chroma_client.create_collection(
-                    name="elitebot_docs",
-                    embedding_function=embed_fn
-                )
-
-                documents = []
-                metadatas = []
-                ids = []
-                doc_counter = 0
-
-                for file in uploaded_files:
-                    content = file.read().decode("utf-8")
-                    # FIX: Split accurately on double newlines without requiring trailing space
-                    chunks = [c.strip() for c in content.split("\n\n") if c.strip()]
+        if st.button("📥 Index Documents into ChromaDB", use_container_width=True, type="primary"):
+            if not api_key:
+                st.error("Please enter your Google Gemini API Key in the sidebar.")
+            elif not uploaded_files:
+                st.warning("Please upload at least one text file.")
+            else:
+                with st.spinner("Processing & embedding documents into ChromaDB vector database..."):
+                    embed_fn = GeminiEmbeddingFunction(api_key=api_key)
                     
-                    for chunk_idx, chunk in enumerate(chunks):
-                        doc_counter += 1
-                        documents.append(chunk)
-                        metadatas.append({"source": file.name, "chunk": chunk_idx})
-                        ids.append(f"doc_{doc_counter}")
+                    try:
+                        st.session_state.chroma_client.delete_collection("elitebot_docs")
+                    except Exception:
+                        pass
 
-                if documents:
-                    collection.add(
-                        documents=documents,
-                        metadatas=metadatas,
-                        ids=ids
+                    collection = st.session_state.chroma_client.create_collection(
+                        name="elitebot_docs",
+                        embedding_function=embed_fn
                     )
-                    st.success(f"Successfully indexed {len(documents)} chunks across {len(uploaded_files)} document(s) into ChromaDB!")
 
-    # View Collection Stats
+                    documents, metadatas, ids = [], [], []
+                    doc_counter = 0
+
+                    for file in uploaded_files:
+                        content = file.read().decode("utf-8")
+                        chunks = [c.strip() for c in content.split("\n\n") if c.strip()]
+                        
+                        for chunk_idx, chunk in enumerate(chunks):
+                            doc_counter += 1
+                            documents.append(chunk)
+                            metadatas.append({"source": file.name, "chunk": chunk_idx})
+                            ids.append(f"doc_{doc_counter}")
+
+                    if documents:
+                        collection.add(documents=documents, metadatas=metadatas, ids=ids)
+                        st.success(f"Successfully indexed **{len(documents)}** chunks across **{len(uploaded_files)}** document(s)!")
+
+    # Collection Stats Display
+    st.divider()
     try:
         col = st.session_state.chroma_client.get_collection("elitebot_docs")
-        st.write(f"**Current ChromaDB Collection Size:** {col.count()} vector chunks stored.")
+        st.metric(label="Active ChromaDB Vector Chunks", value=col.count())
     except Exception:
-        st.write("**Current ChromaDB Collection Size:** 0 vector chunks stored.")
+        st.metric(label="Active ChromaDB Vector Chunks", value=0)
 
-# Tab 2: Multi-Agent Workflow Execution with Semantic Retrieval
+# Tab 2: Workflow Executor
 with tab2:
-    st.header("Execute Multi-Agent Workflow")
-    user_goal = st.text_area("What complex problem or task should the agents solve?", placeholder="Example: Search company policy docs to evaluate customer dispute resolution steps.")
-    top_k = st.slider("Number of Vector Chunks to Retrieve (k):", min_value=1, max_value=10, value=3)
+    st.subheader("Multi-Agent Execution Engine")
+    st.caption("Define the goal and let your team of specialized AI agents solve it.")
 
-    if st.button("🚀 Run Multi-Agent Execution"):
+    col_left, col_right = st.columns([3, 1])
+    with col_left:
+        user_goal = st.text_area("Workflow Goal / Problem Statement:", placeholder="Example: Search company policy docs to evaluate customer dispute resolution steps.", height=120)
+    with col_right:
+        top_k = st.slider("Retrieval Count (k):", min_value=1, max_value=10, value=3)
+
+    if st.button("🚀 Run Multi-Agent Execution", use_container_width=True, type="primary"):
         if not api_key:
             st.error("Please enter your Google Gemini API Key in the sidebar.")
         elif not user_goal.strip():
@@ -114,7 +197,7 @@ with tab2:
             client = genai.Client(api_key=api_key)
             st.session_state.agent_logs = []
 
-            # Step 1: Semantic Search Retrieval via ChromaDB
+            # Step 1: Semantic Search Retrieval
             retrieved_context = "No relevant documents found in ChromaDB."
             try:
                 embed_fn = GeminiEmbeddingFunction(api_key=api_key)
@@ -122,77 +205,49 @@ with tab2:
                     name="elitebot_docs",
                     embedding_function=embed_fn
                 )
-                results = collection.query(
-                    query_texts=[user_goal],
-                    n_results=top_k
-                )
+                results = collection.query(query_texts=[user_goal], n_results=top_k)
                 if results and results.get("documents") and len(results["documents"][0]) > 0:
                     retrieved_context = " --- ".join(results["documents"][0])
             except ValueError:
                 retrieved_context = "No documents found in ChromaDB. Please index documents in Tab 1 first."
             except Exception as e:
-                retrieved_context = f"Vector retrieval error: {str(e)}"
+                retrieved_context = f"Vector retrieval note: {str(e)}"
 
-            # --- Agent 1: Researcher & ChromaDB RAG Context Analyzer ---
-            with st.spinner("Agent 1 (Researcher) retrieving semantic context from ChromaDB..."):
-                prompt_agent1 = f"""
-                You are Agent 1 (Researcher Agent) at EliteBotStudios.
-                Goal: Analyze the following user task using context semantically retrieved from ChromaDB.
-
-                Retrieved Vector Context:
-                {retrieved_context}
-
-                User Goal:
-                {user_goal}
-
-                Provide a structured plan and extract key facts needed to solve this problem.
-                """
+            # Execution Pipeline
+            with st.status("Executing Multi-Agent Workflow...", expanded=True) as status:
+                st.write("🔍 **Agent 1 (Researcher):** Retrieving & analyzing context...")
+                prompt_agent1 = f"You are Agent 1 (Researcher Agent). Context: {retrieved_context}\n\nGoal: {user_goal}\nProvide a structured plan and key facts."
                 res1 = client.models.generate_content(model=selected_model, contents=prompt_agent1)
                 agent1_output = res1.text
                 st.session_state.agent_logs.append(("Agent 1 (Researcher)", agent1_output))
 
-            # --- Agent 2: Problem Solver & Action Planner ---
-            with st.spinner("Agent 2 (Planner) devising solution strategy..."):
-                prompt_agent2 = f"""
-                You are Agent 2 (Strategy & Action Agent) at EliteBotStudios.
-                Review the research findings from Agent 1 and create a clear, step-by-step resolution plan.
-
-                Agent 1 Research Findings:
-                {agent1_output}
-
-                User Goal:
-                {user_goal}
-
-                Provide actionable steps and specific decisions.
-                """
+                st.write("💡 **Agent 2 (Planner):** Formulating strategy...")
+                prompt_agent2 = f"You are Agent 2 (Strategy Agent). Research findings: {agent1_output}\n\nGoal: {user_goal}\nProvide actionable steps."
                 res2 = client.models.generate_content(model=selected_model, contents=prompt_agent2)
                 agent2_output = res2.text
                 st.session_state.agent_logs.append(("Agent 2 (Planner)", agent2_output))
 
-            # --- Agent 3: Action Executor ---
-            with st.spinner("Agent 3 (Executor) producing final action deliverables..."):
-                prompt_agent3 = f"""
-                You are Agent 3 (Execution Agent) at EliteBotStudios.
-                Take the strategy from Agent 2 and execute the final output (e.g., formal report, finalized response, or action draft).
-
-                Strategy Plan from Agent 2:
-                {agent2_output}
-
-                Generate the final ready-to-use output.
-                """
+                st.write("⚙️ **Agent 3 (Executor):** Generating final deliverable...")
+                prompt_agent3 = f"You are Agent 3 (Execution Agent). Strategy plan: {agent2_output}\n\nGenerate the final ready-to-use output."
                 res3 = client.models.generate_content(model=selected_model, contents=prompt_agent3)
                 agent3_output = res3.text
                 st.session_state.agent_logs.append(("Agent 3 (Executor)", agent3_output))
 
-            st.success("Multi-agent vector workflow executed successfully!")
+                status.update(label="Workflow Execution Complete!", state="complete", expanded=False)
 
-# Tab 3: Workflow Logs & Results
+            st.success("Execution completed! View details in the Workflow Logs tab.")
+
+# Tab 3: Workflow Logs
 with tab3:
-    st.header("Agent Execution Results")
+    st.subheader("Execution Output & Agent Logs")
     if not st.session_state.agent_logs:
-        st.info("No workflow has been executed yet. Go to the Multi-Agent Executor tab to start.")
+        st.info("No workflow results yet. Execute a task in the **Multi-Agent Executor** tab.")
     else:
         for agent_name, output in st.session_state.agent_logs:
-            st.subheader(f"📌 {agent_name}")
+            st.markdown(f"""
+            <div class="agent-card">
+                <div class="agent-title">📌 {agent_name}</div>
+            </div>
+            """, unsafe_allow_html=True)
             st.markdown(output)
-            st.markdown("---")
+            st.divider()
