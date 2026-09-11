@@ -1,8 +1,14 @@
 import os
+import io
 import streamlit as st
 import chromadb
 from chromadb.config import Settings
 from google import genai
+
+# Third-party document parsers
+import pypdf
+import docx
+from bs4 import BeautifulSoup
 
 # Page Configuration
 st.set_page_config(
@@ -144,6 +150,38 @@ with st.sidebar:
     st.divider()
     st.info("💡 **Tip:** Upload your docs in Tab 1, then run multi-agent workflows in Tab 2.")
 
+# Universal File Text Extractor
+def extract_text_from_file(uploaded_file) -> str:
+    filename = uploaded_file.name.lower()
+    file_bytes = uploaded_file.read()
+
+    # 1. PDF Documents
+    if filename.endswith(".pdf"):
+        pdf_reader = pypdf.PdfReader(io.BytesIO(file_bytes))
+        text = ""
+        for page in pdf_reader.pages:
+            extracted = page.extract_text()
+            if extracted:
+                text += extracted + "\n\n"
+        return text
+
+    # 2. Word Documents (.docx)
+    elif filename.endswith(".docx"):
+        doc = docx.Document(io.BytesIO(file_bytes))
+        return "\n\n".join([paragraph.text for paragraph in doc.paragraphs if paragraph.text.strip()])
+
+    # 3. HTML / Web Documents
+    elif filename.endswith(".html") or filename.endswith(".htm"):
+        soup = BeautifulSoup(file_bytes, "html.parser")
+        return soup.get_text(separator="\n\n")
+
+    # 4. Text, Markdown, CSV, JSON, Log files, etc.
+    else:
+        try:
+            return file_bytes.decode("utf-8")
+        except UnicodeDecodeError:
+            return file_bytes.decode("latin-1", errors="ignore")
+
 # Helper class to wrap Gemini Embedding API for ChromaDB
 class GeminiEmbeddingFunction(chromadb.EmbeddingFunction):
     def __init__(self, api_key):
@@ -176,15 +214,19 @@ tab1, tab2, tab3 = st.tabs([
 # Tab 1: Knowledge Base Management
 with tab1:
     st.subheader("Document Indexing")
-    st.caption("Upload text or markdown files to index them into ChromaDB for semantic retrieval.")
+    st.caption("Upload files (.pdf, .docx, .txt, .md, .csv, .json, .html) to index them into ChromaDB for semantic retrieval.")
     
-    uploaded_files = st.file_uploader("Upload Text (.txt) or Markdown (.md) documents:", type=["txt", "md"], accept_multiple_files=True)
+    uploaded_files = st.file_uploader(
+        "Upload your documents:", 
+        type=["txt", "md", "pdf", "docx", "csv", "json", "html", "htm", "log"], 
+        accept_multiple_files=True
+    )
 
     if st.button("📥 Index Documents into ChromaDB", use_container_width=True, type="primary"):
         if not api_key:
             st.error("Please enter your Google Gemini API Key in the sidebar.")
         elif not uploaded_files:
-            st.warning("Please upload at least one text file.")
+            st.warning("Please upload at least one document.")
         else:
             with st.spinner("Processing & embedding documents into ChromaDB..."):
                 embed_fn = GeminiEmbeddingFunction(api_key=api_key)
@@ -203,7 +245,7 @@ with tab1:
                 doc_counter = 0
 
                 for file in uploaded_files:
-                    content = file.read().decode("utf-8")
+                    content = extract_text_from_file(file)
                     chunks = [c.strip() for c in content.split("\n\n") if c.strip()]
                     
                     for chunk_idx, chunk in enumerate(chunks):
