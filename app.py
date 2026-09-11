@@ -12,24 +12,24 @@ st.set_page_config(
     layout="wide"
 )
 
-# --- Custom CSS for Light Green & Unique Styling ---
+# --- Custom CSS: Light Blue & Light Green Visual Theme ---
 st.markdown("""
 <style>
-    /* Main Background Accent - Soft Mint Neutral */
+    /* App Background - Soft Blue-Green Neutral */
     .stApp {
-        background-color: #f4f8f5;
+        background-color: #f0f7f7;
         font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
     }
     
-    /* Title Banner Styling - Emerald / Forest Gradient */
+    /* Header Banner - Sky Blue to Emerald Gradient */
     .header-banner {
-        background: linear-gradient(135deg, #1b4332 0%, #2d6a4f 60%, #40916c 100%);
+        background: linear-gradient(135deg, #0f4c81 0%, #1b4332 50%, #2d6a4f 100%);
         padding: 28px 32px;
         border-radius: 16px;
         color: white;
         margin-bottom: 25px;
-        box-shadow: 0 8px 20px rgba(27, 67, 50, 0.12);
-        border: 1px solid rgba(255, 255, 255, 0.1);
+        box-shadow: 0 8px 20px rgba(15, 76, 129, 0.15);
+        border: 1px solid rgba(255, 255, 255, 0.15);
     }
     .header-banner h1 {
         color: #ffffff !important;
@@ -39,19 +39,19 @@ st.markdown("""
         letter-spacing: -0.5px;
     }
     .header-banner p {
-        color: #d8f3dc;
+        color: #e0f2fe;
         margin-top: 8px;
         font-size: 1.05rem;
         font-weight: 400;
     }
 
-    /* Sidebar Customization */
+    /* Sidebar - Light Mint Neutral */
     section[data-testid="stSidebar"] {
-        background-color: #ebf4ee;
-        border-right: 1px solid #d8f3dc;
+        background-color: #e8f4f1;
+        border-right: 1px solid #c8e6c9;
     }
 
-    /* Tab Customization */
+    /* Tabs Styling - Light Blue and Green Accents */
     .stTabs [data-baseweb="tab-list"] {
         gap: 10px;
         background-color: transparent;
@@ -63,49 +63,49 @@ st.markdown("""
         padding-left: 20px;
         padding-right: 20px;
         font-weight: 600;
-        color: #2d6a4f;
-        background-color: #e2ece9;
-        border: 1px solid #d8f3dc;
+        color: #0f4c81;
+        background-color: #e0f2fe;
+        border: 1px solid #bae6fd;
         transition: all 0.2s ease-in-out;
     }
     .stTabs [aria-selected="true"] {
         background-color: #2d6a4f !important;
         color: #ffffff !important;
         border-color: #2d6a4f !important;
-        box-shadow: 0 4px 10px rgba(45, 106, 79, 0.2);
+        box-shadow: 0 4px 10px rgba(45, 106, 79, 0.25);
     }
 
-    /* Primary Buttons */
+    /* Primary Action Buttons */
     div.stButton > button[kind="primary"] {
-        background: linear-gradient(135deg, #2d6a4f 0%, #40916c 100%);
+        background: linear-gradient(135deg, #0284c7 0%, #059669 100%);
         color: white;
         border-radius: 10px;
         border: none;
         padding: 10px 24px;
         font-weight: 600;
-        box-shadow: 0 4px 12px rgba(45, 106, 79, 0.15);
+        box-shadow: 0 4px 12px rgba(2, 132, 199, 0.2);
         transition: all 0.2s ease-in-out;
     }
     div.stButton > button[kind="primary"]:hover {
-        background: linear-gradient(135deg, #1b4332 0%, #2d6a4f 100%);
-        box-shadow: 0 6px 16px rgba(27, 67, 50, 0.25);
+        background: linear-gradient(135deg, #0369a1 0%, #047857 100%);
+        box-shadow: 0 6px 16px rgba(3, 105, 161, 0.3);
         transform: translateY(-1px);
     }
 
     /* Agent Result Cards */
     .agent-card {
         background-color: #ffffff;
-        border-left: 5px solid #52b788;
+        border-left: 5px solid #0284c7;
         border-radius: 12px;
         padding: 20px;
         margin-bottom: 20px;
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
-        border-top: 1px solid #eaf4ed;
-        border-right: 1px solid #eaf4ed;
-        border-bottom: 1px solid #eaf4ed;
+        border-top: 1px solid #e0f2fe;
+        border-right: 1px solid #e0f2fe;
+        border-bottom: 1px solid #e0f2fe;
     }
     .agent-title {
-        color: #1b4332;
+        color: #0f4c81;
         font-weight: 700;
         font-size: 1.15rem;
         margin-bottom: 8px;
@@ -114,15 +114,15 @@ st.markdown("""
         gap: 8px;
     }
 
-    /* Custom Metric Container */
+    /* Custom Metric Styling */
     [data-testid="stMetricValue"] {
-        color: #2d6a4f !important;
+        color: #059669 !important;
         font-weight: 700;
     }
 </style>
 """, unsafe_allow_html=True)
 
-# Application Header
+# Application Header Banner
 st.markdown("""
 <div class="header-banner">
     <h1>🌿 EliteBotStudios Platform</h1>
@@ -136,7 +136,7 @@ with st.sidebar:
     api_key = st.text_input("Enter Google Gemini API Key:", type="password")
     selected_model = st.selectbox("Select Gemini Model:", ["gemini-2.5-flash", "gemini-2.5-pro"])
     st.divider()
-    st.info("💡 **Tip:** Upload your docs in Tab 1, then head to Tab 2 to run your multi-agent workflow.")
+    st.info("💡 **Tip:** Upload your docs in Tab 1, then run multi-agent workflows in Tab 2.")
 
 # Helper class to wrap Gemini Embedding API for ChromaDB
 class GeminiEmbeddingFunction(chromadb.EmbeddingFunction):
@@ -172,44 +172,44 @@ with tab1:
     st.subheader("Document Indexing")
     st.caption("Upload text or markdown files to index them into ChromaDB for semantic retrieval.")
     
-    with st.container():
-        uploaded_files = st.file_uploader("Upload Text (.txt) or Markdown (.md) documents:", type=["txt", "md"], accept_multiple_files=True)
+    uploaded_files = st.file_uploader("Upload Text (.txt) or Markdown (.md) documents:", type=["txt", "md"], accept_multiple_files=True)
 
-        if st.button("📥 Index Documents into ChromaDB", use_container_width=True, type="primary"):
-            if not api_key:
-                st.error("Please enter your Google Gemini API Key in the sidebar.")
-            elif not uploaded_files:
-                st.warning("Please upload at least one text file.")
-            else:
-                with st.spinner("Processing & embedding documents into ChromaDB vector database..."):
-                    embed_fn = GeminiEmbeddingFunction(api_key=api_key)
+    if st.button("📥 Index Documents into ChromaDB", use_container_width=True, type="primary"):
+        if not api_key:
+            st.error("Please enter your Google Gemini API Key in the sidebar.")
+        elif not uploaded_files:
+            st.warning("Please upload at least one text file.")
+        else:
+            with st.spinner("Processing & embedding documents into ChromaDB..."):
+                embed_fn = GeminiEmbeddingFunction(api_key=api_key)
+                
+                try:
+                    st.session_state.chroma_client.delete_collection("elitebot_docs")
+                except Exception:
+                    pass
+
+                collection = st.session_state.chroma_client.create_collection(
+                    name="elitebot_docs",
+                    embedding_function=embed_fn
+                )
+
+                documents, metadatas, ids = [], [], []
+                doc_counter = 0
+
+                for file in uploaded_files:
+                    content = file.read().decode("utf-8")
+                    # Clean paragraph splitting
+                    chunks = [c.strip() for c in content.split("\n\n") if c.strip()]
                     
-                    try:
-                        st.session_state.chroma_client.delete_collection("elitebot_docs")
-                    except Exception:
-                        pass
+                    for chunk_idx, chunk in enumerate(chunks):
+                        doc_counter += 1
+                        documents.append(chunk)
+                        metadatas.append({"source": file.name, "chunk": chunk_idx})
+                        ids.append(f"doc_{doc_counter}")
 
-                    collection = st.session_state.chroma_client.create_collection(
-                        name="elitebot_docs",
-                        embedding_function=embed_fn
-                    )
-
-                    documents, metadatas, ids = [], [], []
-                    doc_counter = 0
-
-                    for file in uploaded_files:
-                        content = file.read().decode("utf-8")
-                        chunks = [c.strip() for c in content.split("\n\n") if c.strip()]
-                        
-                        for chunk_idx, chunk in enumerate(chunks):
-                            doc_counter += 1
-                            documents.append(chunk)
-                            metadatas.append({"source": file.name, "chunk": chunk_idx})
-                            ids.append(f"doc_{doc_counter}")
-
-                    if documents:
-                        collection.add(documents=documents, metadatas=metadatas, ids=ids)
-                        st.success(f"Successfully indexed **{len(documents)}** chunks across **{len(uploaded_files)}** document(s)!")
+                if documents:
+                    collection.add(documents=documents, metadatas=metadatas, ids=ids)
+                    st.success(f"Successfully indexed **{len(documents)}** chunks across **{len(uploaded_files)}** document(s)!")
 
     # Collection Stats Display
     st.divider()
@@ -239,7 +239,7 @@ with tab2:
             client = genai.Client(api_key=api_key)
             st.session_state.agent_logs = []
 
-            # Step 1: Semantic Search Retrieval
+            # Step 1: Semantic Search Retrieval with explicit handling
             retrieved_context = "No relevant documents found in ChromaDB."
             try:
                 embed_fn = GeminiEmbeddingFunction(api_key=api_key)
@@ -253,27 +253,24 @@ with tab2:
             except ValueError:
                 retrieved_context = "No documents found in ChromaDB. Please index documents in Tab 1 first."
             except Exception as e:
-                retrieved_context = f"Vector retrieval note: {str(e)}"
+                retrieved_context = f"Vector retrieval error: {str(e)}"
 
             # Execution Pipeline
             with st.status("Executing Multi-Agent Workflow...", expanded=True) as status:
                 st.write("🔍 **Agent 1 (Researcher):** Retrieving & analyzing context...")
-                prompt_agent1 = f"You are Agent 1 (Researcher Agent). Context: {retrieved_context}\n\nGoal: {user_goal}\nProvide a structured plan and key facts."
+                prompt_agent1 = f"You are Agent 1 (Researcher Agent). Context:\n{retrieved_context}\n\nGoal:\n{user_goal}\nProvide structured findings and key facts."
                 res1 = client.models.generate_content(model=selected_model, contents=prompt_agent1)
-                agent1_output = res1.text
-                st.session_state.agent_logs.append(("Agent 1 (Researcher)", agent1_output))
+                st.session_state.agent_logs.append(("Agent 1 (Researcher)", res1.text))
 
                 st.write("💡 **Agent 2 (Planner):** Formulating strategy...")
-                prompt_agent2 = f"You are Agent 2 (Strategy Agent). Research findings: {agent1_output}\n\nGoal: {user_goal}\nProvide actionable steps."
+                prompt_agent2 = f"You are Agent 2 (Strategy Agent). Research findings:\n{res1.text}\n\nGoal:\n{user_goal}\nProvide actionable resolution steps."
                 res2 = client.models.generate_content(model=selected_model, contents=prompt_agent2)
-                agent2_output = res2.text
-                st.session_state.agent_logs.append(("Agent 2 (Planner)", agent2_output))
+                st.session_state.agent_logs.append(("Agent 2 (Planner)", res2.text))
 
                 st.write("⚙️ **Agent 3 (Executor):** Generating final deliverable...")
-                prompt_agent3 = f"You are Agent 3 (Execution Agent). Strategy plan: {agent2_output}\n\nGenerate the final ready-to-use output."
+                prompt_agent3 = f"You are Agent 3 (Execution Agent). Strategy plan:\n{res2.text}\n\nGenerate final ready-to-use output."
                 res3 = client.models.generate_content(model=selected_model, contents=prompt_agent3)
-                agent3_output = res3.text
-                st.session_state.agent_logs.append(("Agent 3 (Executor)", agent3_output))
+                st.session_state.agent_logs.append(("Agent 3 (Executor)", res3.text))
 
                 status.update(label="Workflow Execution Complete!", state="complete", expanded=False)
 
