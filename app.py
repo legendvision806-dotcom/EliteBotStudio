@@ -1,3 +1,4 @@
+
 import os
 import streamlit as st
 import chromadb
@@ -6,7 +7,6 @@ from google import genai
 
 # Page Configuration
 st.set_page_config(page_title="EliteBotStudios - ChromaDB RAG Agent Platform", page_icon="🤖", layout="wide")
-
 st.title("🤖 EliteBotStudios Platform")
 st.subheader("Action-Oriented Multi-Agent & ChromaDB Vector RAG Workflow Engine")
 
@@ -47,7 +47,7 @@ tab1, tab2, tab3 = st.tabs(["📚 Vector Knowledge Base (ChromaDB)", "🤖 Multi
 with tab1:
     st.header("Upload & Index Documents into ChromaDB")
     uploaded_files = st.file_uploader("Upload Text (.txt) or Markdown (.md) documents:", type=["txt", "md"], accept_multiple_files=True)
-    
+
     if st.button("Index Documents into ChromaDB"):
         if not api_key:
             st.error("Please enter your Google Gemini API Key in the sidebar.")
@@ -71,14 +71,12 @@ with tab1:
                 documents = []
                 metadatas = []
                 ids = []
-
                 doc_counter = 0
+
                 for file in uploaded_files:
                     content = file.read().decode("utf-8")
-                    # Simple line/chunk split
-                    chunks = [c.strip() for c in content.split("\n\n
-
-") if c.strip()]
+                    # FIX: Split accurately on double newlines without requiring trailing space
+                    chunks = [c.strip() for c in content.split("\n\n") if c.strip()]
                     
                     for chunk_idx, chunk in enumerate(chunks):
                         doc_counter += 1
@@ -87,7 +85,11 @@ with tab1:
                         ids.append(f"doc_{doc_counter}")
 
                 if documents:
-                    collection.add(documents=documents, metadatas=metadatas, ids=ids)
+                    collection.add(
+                        documents=documents,
+                        metadatas=metadatas,
+                        ids=ids
+                    )
                     st.success(f"Successfully indexed {len(documents)} chunks across {len(uploaded_files)} document(s) into ChromaDB!")
 
     # View Collection Stats
@@ -100,9 +102,7 @@ with tab1:
 # Tab 2: Multi-Agent Workflow Execution with Semantic Retrieval
 with tab2:
     st.header("Execute Multi-Agent Workflow")
-    user_goal = st.text_area("What complex problem or task should the agents solve?", 
-                             placeholder="Example: Search company policy docs to evaluate customer dispute resolution steps.")
-
+    user_goal = st.text_area("What complex problem or task should the agents solve?", placeholder="Example: Search company policy docs to evaluate customer dispute resolution steps.")
     top_k = st.slider("Number of Vector Chunks to Retrieve (k):", min_value=1, max_value=10, value=3)
 
     if st.button("🚀 Run Multi-Agent Execution"):
@@ -119,17 +119,19 @@ with tab2:
             try:
                 embed_fn = GeminiEmbeddingFunction(api_key=api_key)
                 collection = st.session_state.chroma_client.get_collection(
-                    name="elitebot_docs", 
+                    name="elitebot_docs",
                     embedding_function=embed_fn
                 )
-                results = collection.query(query_texts=[user_goal], n_results=top_k)
-                
+                results = collection.query(
+                    query_texts=[user_goal],
+                    n_results=top_k
+                )
                 if results and results.get("documents") and len(results["documents"][0]) > 0:
-                    retrieved_context = "
----
-".join(results["documents"][0])
+                    retrieved_context = " --- ".join(results["documents"][0])
+            except ValueError:
+                retrieved_context = "No documents found in ChromaDB. Please index documents in Tab 1 first."
             except Exception as e:
-                retrieved_context = f"Vector retrieval note: {str(e)}"
+                retrieved_context = f"Vector retrieval error: {str(e)}"
 
             # --- Agent 1: Researcher & ChromaDB RAG Context Analyzer ---
             with st.spinner("Agent 1 (Researcher) retrieving semantic context from ChromaDB..."):
